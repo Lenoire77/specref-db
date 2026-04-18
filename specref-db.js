@@ -1,6 +1,8 @@
 // SpecRef Database v0.1.0
 // NOTE: Reference only. Verify against official standards.
 
+console.log("DB SCRIPT EXECUTED");
+
 window.SPECREF_DB = {
   metadata: {
     version: "0.1.0",
