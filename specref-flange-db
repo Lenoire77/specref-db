@@ -1,0 +1,1107 @@
+/**
+ * SpecRef Flange Database
+ * Source: Trouvay & Cauvin – Piping Equipment 2001, Chapter 3
+ * Standards: ASME B16.5, ASME B16.47 Series A & B, MSS-SP 44,
+ *            BS 3293, API 6A, ASME B16.36
+ * All linear dimensions in mm unless noted. Weights in kg (approximate).
+ */
+
+const SPECREF_FLANGE_DB = {
+
+  // ─────────────────────────────────────────────────────────────────
+  // META
+  // ─────────────────────────────────────────────────────────────────
+  meta: {
+    title:   "SpecRef Flange Database",
+    source:  "Trouvay & Cauvin – Piping Equipment 2001, Chapter 3",
+    edition: "2001",
+    units: {
+      dimensions: "mm",
+      weights:    "kg (approximate)",
+      pressure:   "bar / PSI (as noted)"
+    },
+    lastUpdated: "2024"
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // STANDARDS COVERED
+  // ─────────────────────────────────────────────────────────────────
+  standards: [
+    {
+      id:      "ASME_B16_5",
+      code:    "ASME B16.5",
+      edition: "1996",
+      title:   "Pipe Flanges and Flanged Fittings NPS 1/2 to 24",
+      npsRange: { min: "1/2", max: "24" },
+      pressureClasses: [150, 300, 400, 600, 900, 1500, 2500]
+    },
+    {
+      id:      "ASME_B16_47_A",
+      code:    "ASME B16.47 Series A",
+      edition: "1996",
+      title:   "Large Diameter Steel Flanges NPS 26 to 60 (Series A)",
+      npsRange: { min: "26", max: "60" },
+      pressureClasses: [150, 300, 400, 600, 900],
+      note: "Series A aligns with MSS-SP 44"
+    },
+    {
+      id:      "ASME_B16_47_B",
+      code:    "ASME B16.47 Series B",
+      edition: "1996",
+      title:   "Large Diameter Steel Flanges NPS 26 to 60 (Series B)",
+      npsRange: { min: "26", max: "60" },
+      pressureClasses: [150, 300, 600, 900],
+      note: "Replaces API 605"
+    },
+    {
+      id:      "MSS_SP_44",
+      code:    "MSS-SP 44",
+      edition: "1996",
+      title:   "Steel Pipeline Flanges",
+      npsRange: { min: "12", max: "60" },
+      note: "NPS 12 to 24 identical to ASME B16.5"
+    },
+    {
+      id:      "BS_3293",
+      code:    "BS 3293",
+      edition: "1960",
+      title:   "Carbon Steel Pipe Flanges for the Petroleum Industry",
+      npsRange: { min: "26", max: "48" },
+      pressureClasses: [150, 300, 400, 600]
+    },
+    {
+      id:      "API_6A",
+      code:    "API 6A",
+      edition: "1999",
+      title:   "Wellhead and Christmas Tree Equipment",
+      flangeTypes: ["6B", "6BX"],
+      workingPressures_PSI: [2000, 3000, 5000, 10000, 15000, 20000]
+    },
+    {
+      id:      "ASME_B16_36",
+      code:    "ASME B16.36",
+      edition: "1996",
+      title:   "Orifice Flanges",
+      npsRange: { min: "1", max: "24" },
+      pressureClasses: [300, 400, 600, 900, 1500, 2500]
+    },
+    {
+      id:      "ASME_B16_20",
+      code:    "ASME B16.20",
+      edition: "1998",
+      title:   "Metallic Gaskets for Pipe Flanges (replaces API 601-1988)"
+    },
+    {
+      id:      "ASME_B16_21",
+      code:    "ASME B16.21",
+      edition: "1992",
+      title:   "Nonmetallic Flat Gaskets for Pipe Flanges"
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────────────
+  // PRESSURE CLASS / ISO PN EQUIVALENCE
+  // ─────────────────────────────────────────────────────────────────
+  pressureClassMap: [
+    { asme: 150,  isoPn: 20  },
+    { asme: 300,  isoPn: 50  },
+    { asme: 400,  isoPn: 68  },
+    { asme: 600,  isoPn: 100 },
+    { asme: 900,  isoPn: 150 },
+    { asme: 1500, isoPn: 250 },
+    { asme: 2500, isoPn: 420 }
+  ],
+
+  // Pressure classes with common bolt-hole / OD between API 6A and ASME B16.5
+  api6A_vs_asmeB16_5_commonClasses: {
+    weldingNeck:            { commonClasses: ["300-400-600", "900-1500", "2000-3000-5000"] },
+    blind:                  { commonClasses: ["300-400-600", "900-1500", "2000-3000-5000"] },
+    threadedAndIntegral:    { commonClasses: ["300-600"] },
+    note: "All API type 6B flange dimensions agree with corresponding ASME B16.5"
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // FLANGE TYPES
+  // ─────────────────────────────────────────────────────────────────
+  flangeTypes: [
+    {
+      id:    "WN",
+      code:  "WN",
+      name:  "Welding Neck",
+      nameFR:"Collerette à souder",
+      description: "Hub tapers from flange to pipe OD; butt-welded to pipe. Highest integrity joint."
+    },
+    {
+      id:    "SO",
+      code:  "SO",
+      name:  "Slip-On",
+      nameFR:"Emmanchée soudée",
+      description: "Slips over pipe; fillet-welded inside and outside."
+    },
+    {
+      id:    "BL",
+      code:  "BL",
+      name:  "Blind",
+      nameFR:"Pleine",
+      description: "Solid disc used to blank off a pipeline or vessel opening."
+    },
+    {
+      id:    "TH",
+      code:  "TH",
+      name:  "Threaded",
+      nameFR:"Taraudée / Filetée",
+      description: "Screwed onto threaded pipe end; no welding required."
+    },
+    {
+      id:    "SW",
+      code:  "SW",
+      name:  "Socket Welding",
+      nameFR:"À emboîter",
+      description: "Pipe inserts into flange socket bore; fillet-welded externally."
+    },
+    {
+      id:    "LA",
+      code:  "LA",
+      name:  "Lapped / Lap Joint",
+      nameFR:"Tournante",
+      description: "Used with a lap-joint stub end; flange rotates freely."
+    },
+    {
+      id:    "LWN",
+      code:  "LWN",
+      name:  "Long Welding Neck",
+      nameFR:"Long welding-neck",
+      description: "Extended hub WN flange; length specified by purchaser."
+    },
+    {
+      id:    "OR",
+      code:  "OR",
+      name:  "Orifice Flange",
+      nameFR:"Bride à orifice",
+      standard: "ASME B16.36",
+      description: "Flanges with tapped pressure-tap holes for orifice plates."
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────────────
+  // FACING TYPES  (ASME B16.5-1996)
+  // ─────────────────────────────────────────────────────────────────
+  facingTypes: [
+    {
+      id:    "RF",
+      code:  "RF",
+      name:  "Raised Face",
+      nameFR:"Face surélevée",
+      heightMm: {
+        class150_300: 1.6,   // included in hub dimension Y
+        class400_plus: 6.4
+      },
+      applicableClasses: [150, 300, 400, 600, 900, 1500, 2500],
+      note: "Class 150 & 300: raised face 1.6 mm included in flange Y dimension. Class 400+: 6.4 mm."
+    },
+    {
+      id:    "FF",
+      code:  "FF",
+      name:  "Flat Face",
+      nameFR:"Face plane",
+      applicableClasses: [150, 300]
+    },
+    {
+      id:    "RTJ",
+      code:  "RTJ",
+      name:  "Ring Joint",
+      nameFR:"Face usinée pour joint annulaire",
+      applicableClasses: [150, 300, 400, 600, 900, 1500, 2500],
+      ringTypes: ["R (Oval / Octagonal)", "RX (Pressure-energised)", "BX (API 6A)"]
+    },
+    {
+      id:    "TG_L",
+      code:  "T&G-Large",
+      name:  "Large Tongue & Groove",
+      nameFR:"Emboîtement double mâle/femelle large",
+      applicableClasses: [300, 400, 600, 900, 1500, 2500]
+    },
+    {
+      id:    "TG_S",
+      code:  "T&G-Small",
+      name:  "Small Tongue & Groove",
+      nameFR:"Emboîtement double mâle/femelle étroit",
+      applicableClasses: [150, 300, 400, 600, 900, 1500, 2500]
+    },
+    {
+      id:    "MF_L",
+      code:  "M&F-Large",
+      name:  "Large Male & Female",
+      nameFR:"Emboîtement simple mâle/femelle large",
+      applicableClasses: [300, 400, 600, 900, 1500, 2500]
+    },
+    {
+      id:    "MF_S",
+      code:  "M&F-Small",
+      name:  "Small Male & Female",
+      nameFR:"Emboîtement simple mâle/femelle étroit",
+      applicableClasses: [150, 300, 400, 600, 900, 1500, 2500]
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────────────
+  // FLANGE FACING FINISH  (ASME B16.5-1996)
+  // ─────────────────────────────────────────────────────────────────
+  facingFinish: {
+    raisedFace_flatFace: {
+      stock_finish:       "125–250 µin (3.2–6.3 µm) Ra – phonographic concentric or spiral serrated",
+      smooth_finish:      "≤ 125 µin (3.2 µm) Ra",
+      cutting_tool_pitch: "approx. 0.06 in (1.5 mm) pitch",
+      serrations_per_in:  "45–55",
+      note: "Tongue, groove, male, female faces: ≤ 125 µin (3.2 µm) Ra"
+    },
+    ringJoint: {
+      surfaceFinish_Ra_max: "1.6 µm (63 µin)"
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // MATERIALS  (ASTM)
+  // ─────────────────────────────────────────────────────────────────
+  materials: {
+    carbonSteels: [
+      {
+        astmGrade:      "A 105 / A 105M-98",
+        description:    "Carbon steel forgings for piping components",
+        tensileMin_MPa: 485,
+        yieldMin_MPa:   250,
+        elongMin_pct:   22,
+        reductionMin_pct: 30,
+        hardnessMax_HB: 187
+      },
+      {
+        astmGrade:      "A 181 / A 181M-95 Class 60",
+        tensileMin_MPa: 415,
+        yieldMin_MPa:   205,
+        elongMin_pct:   22,
+        reductionMin_pct: 35
+      },
+      {
+        astmGrade:      "A 181 / A 181M-95 Class 70",
+        tensileMin_MPa: 485,
+        yieldMin_MPa:   250,
+        elongMin_pct:   22,
+        reductionMin_pct: 24
+      }
+    ],
+    alloyHiTempSteels: [
+      { astmGrade: "A 182 F1",  uns: "K12822" },
+      { astmGrade: "A 182 F2",  uns: "K12122" },
+      { astmGrade: "A 182 F5",  uns: "K41545" },
+      { astmGrade: "A 182 F9",  uns: "K90941" },
+      { astmGrade: "A 182 F11 Class 2", uns: "K11572" },
+      { astmGrade: "A 182 F12 Class 2", uns: "K11564" },
+      { astmGrade: "A 182 F22 Class 3", uns: "K21590" },
+      { astmGrade: "A 182 F304",   uns: "S30400" },
+      { astmGrade: "A 182 F304L",  uns: "S30403" },
+      { astmGrade: "A 182 F316",   uns: "S31600" },
+      { astmGrade: "A 182 F316L",  uns: "S31603" },
+      { astmGrade: "A 182 F321",   uns: "S32100" },
+      { astmGrade: "A 182 F347",   uns: "S34700" },
+      { astmGrade: "A 182 F348",   uns: "S34800" },
+      { astmGrade: "A 182 F310",   uns: "S31000" }
+    ],
+    lowTempSteels: [
+      { astmGrade: "A 350 LF1", tensileRange_MPa: "415–585", yieldMin_MPa: 205 },
+      { astmGrade: "A 350 LF2", tensileRange_MPa: "485–655", yieldMin_MPa: 250, impactTemp_C: -46 },
+      { astmGrade: "A 350 LF3", tensileRange_MPa: "485–655", yieldMin_MPa: 260, impactTemp_C: -102 }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // ASME B16.5 DIMENSIONS  (NPS 1/2 to 24)
+  // ─────────────────────────────────────────────────────────────────
+  // Dimension key:
+  //   nps  = nominal pipe size (string)
+  //   dn   = nominal diameter (mm)
+  //   A    = hub OD at weld end (mm)
+  //   X    = flange OD (mm)
+  //   Y_WN = overall length welding neck (mm)
+  //   Y_SO = overall length slip-on (mm)
+  //   B2   = bore (weld end bore, minimum, mm)
+  //   T    = minimum flange thickness / blind thickness (mm)
+  //   r    = fillet radius (mm)
+  //   boltCircle_R = bolt circle diameter (mm)  [see drilling tables]
+  //   wt_WN / wt_SO / wt_BL / wt_TH / wt_SW = approx weights (kg)
+  // ─────────────────────────────────────────────────────────────────
+  dimensions: {
+
+    // ── CLASS 150 ─────────────────────────────────────────────────
+    class150: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 1.6,
+      sizes: [
+        { nps:"1/2",  dn:15,  A:21.3,  X:38,  Y_WN:16,  Y_SO:22, B2:22.9,  T:16, r:3,  wt_WN:0.8,  wt_SO:0.8,  wt_BL:0.8,  wt_TH:0.8,  wt_SW:1.2  },
+        { nps:"3/4",  dn:20,  A:26.7,  X:48,  Y_WN:16,  Y_SO:25, B2:28.2,  T:16, r:3,  wt_WN:0.9,  wt_SO:0.9,  wt_BL:0.9,  wt_TH:0.9,  wt_SW:1.3  },
+        { nps:"1",    dn:25,  A:33.4,  X:54,  Y_WN:17,  Y_SO:27, B2:35.0,  T:18, r:3,  wt_WN:1.0,  wt_SO:1.0,  wt_BL:1.0,  wt_TH:1.0,  wt_SW:1.4  },
+        { nps:"1-1/4",dn:32,  A:42.2,  X:63,  Y_WN:21,  Y_SO:29, B2:43.7,  T:21, r:5,  wt_WN:1.3,  wt_SO:1.3,  wt_BL:1.3,  wt_TH:1.3,  wt_SW:1.8  },
+        { nps:"1-1/2",dn:40,  A:48.3,  X:70,  Y_WN:22,  Y_SO:32, B2:50.0,  T:22, r:6,  wt_WN:1.5,  wt_SO:1.5,  wt_BL:1.4,  wt_TH:1.5,  wt_SW:2.2  },
+        { nps:"2",    dn:50,  A:60.3,  X:84,  Y_WN:25,  Y_SO:37, B2:62.5,  T:25, r:8,  wt_WN:2.3,  wt_SO:2.3,  wt_BL:2.3,  wt_TH:2.3,  wt_SW:2.8  },
+        { nps:"2-1/2",dn:65,  A:73.0,  X:100, Y_WN:29,  Y_SO:41, B2:75.4,  T:29, r:8,  wt_WN:3.7,  wt_SO:3.7,  wt_BL:3.0,  wt_TH:3.7,  wt_SW:4.7  },
+        { nps:"3",    dn:80,  A:88.9,  X:117, Y_WN:30,  Y_SO:46, B2:91.4,  T:30, r:10, wt_WN:4.2,  wt_SO:4.2,  wt_BL:3.5,  wt_TH:4.2,  wt_SW:5.5  },
+        { nps:"3-1/2",dn:null,A:101.6, X:133, Y_WN:32,  Y_SO:49, B2:104.1, T:32, r:11, wt_WN:5.3,  wt_SO:5.3,  wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"4",    dn:100, A:114.3, X:146, Y_WN:33,  Y_SO:54, B2:116.8, T:33, r:11, wt_WN:5.9,  wt_SO:5.9,  wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"5",    dn:125, A:141.3, X:178, Y_WN:37,  Y_SO:60, B2:144.5, T:37, r:11, wt_WN:7.0,  wt_SO:7.0,  wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"6",    dn:150, A:168.3, X:206, Y_WN:40,  Y_SO:67, B2:171.4, T:40, r:13, wt_WN:8.5,  wt_SO:8.5,  wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"8",    dn:200, A:219.1, X:260, Y_WN:44,  Y_SO:76, B2:222.2, T:44, r:13, wt_WN:13.5, wt_SO:13.5, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"10",   dn:250, A:273.0, X:320, Y_WN:49,  Y_SO:86, B2:277.4, T:49, r:13, wt_WN:19.5, wt_SO:19.5, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"12",   dn:300, A:323.9, X:375, Y_WN:56,  Y_SO:92, B2:328.2, T:56, r:13, wt_WN:29.0, wt_SO:29.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"14",   dn:350, A:355.6, X:425, Y_WN:57,  Y_SO:94, B2:360.2, T:57, r:13, wt_WN:39.0, wt_SO:39.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"16",   dn:400, A:406.4, X:483, Y_WN:63,  Y_SO:106,B2:411.2, T:64, r:13, wt_WN:47.0, wt_SO:47.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"18",   dn:450, A:457.0, X:533, Y_WN:68,  Y_SO:117,B2:462.3, T:68, r:13, wt_WN:54.0, wt_SO:54.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"20",   dn:500, A:508.0, X:587, Y_WN:73,  Y_SO:127,B2:514.4, T:73, r:13, wt_WN:70.0, wt_SO:70.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"24",   dn:600, A:610.0, X:701, Y_WN:83,  Y_SO:140,B2:616.0, T:83, r:13, wt_WN:95.0, wt_SO:95.0, wt_BL:118.0,wt_TH:null, wt_SW:null }
+      ]
+    },
+
+    // ── CLASS 300 ─────────────────────────────────────────────────
+    class300: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 1.6,
+      sizes: [
+        { nps:"1/2",  dn:15,  A:21.3,  X:38,  Y_WN:52,  Y_SO:null, B2:22.9,  T:16, r:3,  wt_WN:1.5,  wt_SO:1.2,  wt_BL:1.2,  wt_TH:1.2,  wt_SW:null },
+        { nps:"3/4",  dn:20,  A:26.7,  X:48,  Y_WN:57,  Y_SO:null, B2:28.2,  T:16, r:3,  wt_WN:1.8,  wt_SO:1.3,  wt_BL:1.3,  wt_TH:1.3,  wt_SW:null },
+        { nps:"1",    dn:25,  A:33.5,  X:54,  Y_WN:62,  Y_SO:null, B2:35.0,  T:18, r:3,  wt_WN:2.0,  wt_SO:1.4,  wt_BL:1.4,  wt_TH:1.4,  wt_SW:null },
+        { nps:"1-1/4",dn:32,  A:42.2,  X:64,  Y_WN:65,  Y_SO:null, B2:43.7,  T:21, r:3,  wt_WN:2.5,  wt_SO:1.8,  wt_BL:1.8,  wt_TH:1.8,  wt_SW:null },
+        { nps:"1-1/2",dn:40,  A:48.3,  X:70,  Y_WN:68,  Y_SO:null, B2:50.0,  T:22, r:5,  wt_WN:3.5,  wt_SO:2.5,  wt_BL:2.5,  wt_TH:2.5,  wt_SW:null },
+        { nps:"2",    dn:50,  A:60.3,  X:84,  Y_WN:70,  Y_SO:null, B2:62.5,  T:29, r:6,  wt_WN:4.0,  wt_SO:3.0,  wt_BL:3.0,  wt_TH:3.0,  wt_SW:null },
+        { nps:"2-1/2",dn:65,  A:73.0,  X:100, Y_WN:76,  Y_SO:null, B2:75.4,  T:32, r:8,  wt_WN:5.0,  wt_SO:4.5,  wt_BL:4.5,  wt_TH:4.5,  wt_SW:null },
+        { nps:"3",    dn:80,  A:88.9,  X:118, Y_WN:79,  Y_SO:null, B2:91.4,  T:32, r:8,  wt_WN:7.0,  wt_SO:6.0,  wt_BL:6.0,  wt_TH:6.0,  wt_SW:null },
+        { nps:"3-1/2",dn:null,A:101.6, X:133, Y_WN:81,  Y_SO:null, B2:104.1, T:37, r:10, wt_WN:9.2,  wt_SO:null, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"4",    dn:100, A:114.3, X:152, Y_WN:86,  Y_SO:null, B2:116.8, T:37, r:10, wt_WN:11.0, wt_SO:10.1, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"5",    dn:125, A:141.3, X:189, Y_WN:98,  Y_SO:null, B2:144.5, T:43, r:10, wt_WN:14.0, wt_SO:12.5, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"6",    dn:150, A:168.3, X:222, Y_WN:98,  Y_SO:null, B2:171.4, T:46, r:11, wt_WN:19.0, wt_SO:17.5, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"8",    dn:200, A:219.1, X:273, Y_WN:111, Y_SO:null, B2:222.2, T:51, r:11, wt_WN:30.0, wt_SO:26.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"10",   dn:250, A:273.0, X:343, Y_WN:117, Y_SO:null, B2:277.4, T:56, r:13, wt_WN:41.0, wt_SO:38.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"12",   dn:300, A:323.9, X:400, Y_WN:130, Y_SO:null, B2:328.2, T:61, r:13, wt_WN:62.0, wt_SO:52.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"14",   dn:350, A:355.6, X:432, Y_WN:143, Y_SO:null, B2:360.2, T:64, r:13, wt_WN:84.0, wt_SO:74.0, wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"16",   dn:400, A:406.4, X:495, Y_WN:146, Y_SO:null, B2:411.2, T:68, r:13, wt_WN:111.0,wt_SO:100.0,wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"18",   dn:450, A:457.0, X:546, Y_WN:159, Y_SO:null, B2:462.3, T:70, r:13, wt_WN:138.0,wt_SO:127.0,wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"20",   dn:500, A:508.0, X:610, Y_WN:162, Y_SO:null, B2:514.4, T:73, r:13, wt_WN:171.0,wt_SO:147.0,wt_BL:null, wt_TH:null, wt_SW:null },
+        { nps:"24",   dn:600, A:610.0, X:718, Y_WN:168, Y_SO:null, B2:616.0, T:83, r:13, wt_WN:247.0,wt_SO:208.0,wt_BL:null, wt_TH:null, wt_SW:null }
+      ]
+    },
+
+    // ── CLASS 400 ─────────────────────────────────────────────────
+    class400: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 6.4,
+      note: "For NPS 1/2 to 3-1/2, use class 600 dimensions",
+      sizes: [
+        { nps:"4",    dn:100, A:114.3, X:146, Y_WN:89,  B2:116.8, T:37, wt_WN:13.0, wt_BL:13.0 },
+        { nps:"5",    dn:125, A:141.3, X:178, Y_WN:102, B2:144.5, T:43, wt_WN:18.5, wt_BL:18.5 },
+        { nps:"6",    dn:150, A:168.3, X:206, Y_WN:103, B2:171.4, T:46, wt_WN:25.0, wt_BL:25.0 },
+        { nps:"8",    dn:200, A:219.1, X:260, Y_WN:117, B2:222.2, T:51, wt_WN:34.0, wt_BL:34.0 },
+        { nps:"10",   dn:250, A:273.0, X:320, Y_WN:124, B2:277.4, T:54, wt_WN:51.0, wt_BL:54.0 },
+        { nps:"12",   dn:300, A:323.9, X:375, Y_WN:137, B2:328.2, T:57, wt_WN:69.0, wt_BL:70.0 },
+        { nps:"14",   dn:350, A:355.6, X:425, Y_WN:149, B2:360.2, T:60, wt_WN:95.0, wt_BL:85.0 },
+        { nps:"16",   dn:400, A:406.4, X:483, Y_WN:152, B2:411.2, T:64, wt_WN:127.0,wt_BL:120.0},
+        { nps:"18",   dn:450, A:457.0, X:533, Y_WN:165, B2:462.3, T:68, wt_WN:157.0,wt_BL:150.0},
+        { nps:"20",   dn:500, A:508.0, X:587, Y_WN:168, B2:514.4, T:70, wt_WN:191.0,wt_BL:185.0},
+        { nps:"24",   dn:600, A:610.0, X:701, Y_WN:175, B2:616.0, T:83, wt_WN:279.0,wt_BL:260.0}
+      ]
+    },
+
+    // ── CLASS 600 ─────────────────────────────────────────────────
+    class600: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 6.4,
+      sizes: [
+        { nps:"1/2",  dn:15,  A:21.3,  X:38,  Y_WN:52,  B2:22.9,  T:16, r:3,  wt_WN:1.4, wt_SO:1.3, wt_BL:1.4  },
+        { nps:"3/4",  dn:20,  A:26.7,  X:48,  Y_WN:57,  B2:28.2,  T:16, r:3,  wt_WN:1.6, wt_SO:1.4, wt_BL:1.6  },
+        { nps:"1",    dn:25,  A:33.4,  X:54,  Y_WN:62,  B2:35.0,  T:18, r:3,  wt_WN:2.1, wt_SO:1.8, wt_BL:2.1  },
+        { nps:"1-1/4",dn:32,  A:42.2,  X:64,  Y_WN:67,  B2:43.7,  T:21, r:3,  wt_WN:2.6, wt_SO:2.1, wt_BL:2.6  },
+        { nps:"1-1/2",dn:40,  A:48.3,  X:70,  Y_WN:70,  B2:50.0,  T:22, r:5,  wt_WN:3.3, wt_SO:3.1, wt_BL:3.3  },
+        { nps:"2",    dn:50,  A:60.3,  X:84,  Y_WN:73,  B2:62.5,  T:29, r:6,  wt_WN:4.4, wt_SO:4.0, wt_BL:4.4  },
+        { nps:"2-1/2",dn:65,  A:73.0,  X:100, Y_WN:79,  B2:75.4,  T:35, r:8,  wt_WN:6.0, wt_SO:5.4, wt_BL:6.0  },
+        { nps:"3",    dn:80,  A:88.9,  X:118, Y_WN:83,  B2:91.4,  T:40, r:8,  wt_WN:7.4, wt_SO:7.0, wt_BL:7.4  },
+        { nps:"3-1/2",dn:null,A:101.6, X:133, Y_WN:86,  B2:104.1, T:40, r:10, wt_WN:9.5, wt_SO:8.9, wt_BL:9.5  },
+        { nps:"4",    dn:100, A:114.3, X:152, Y_WN:102, B2:116.8, T:48, r:10, wt_WN:17.0,wt_SO:16.0,wt_BL:17.0 },
+        { nps:"5",    dn:125, A:141.3, X:189, Y_WN:114, B2:144.5, T:51, r:10, wt_WN:25.0,wt_SO:25.0,wt_BL:27.0 },
+        { nps:"6",    dn:150, A:168.3, X:222, Y_WN:117, B2:171.4, T:57, r:11, wt_WN:30.0,wt_SO:30.0,wt_BL:32.0 },
+        { nps:"8",    dn:200, A:219.1, X:273, Y_WN:127, B2:222.2, T:63, r:11, wt_WN:43.0,wt_SO:43.0,wt_BL:46.0 },
+        { nps:"10",   dn:250, A:273.0, X:343, Y_WN:140, B2:277.4, T:70, r:13, wt_WN:70.0,wt_SO:70.0,wt_BL:74.0 },
+        { nps:"12",   dn:300, A:323.9, X:400, Y_WN:152, B2:328.2, T:78, r:13, wt_WN:86.0,wt_SO:86.0,wt_BL:90.0 },
+        { nps:"14",   dn:350, A:355.6, X:432, Y_WN:156, B2:360.2, T:79, r:13, wt_WN:100.0,wt_SO:100.0,wt_BL:108.0},
+        { nps:"16",   dn:400, A:406.4, X:495, Y_WN:165, B2:411.2, T:84, r:13, wt_WN:142.0,wt_SO:142.0,wt_BL:150.0},
+        { nps:"18",   dn:450, A:457.0, X:546, Y_WN:178, B2:462.3, T:90, r:13, wt_WN:175.0,wt_SO:175.0,wt_BL:188.0},
+        { nps:"20",   dn:500, A:508.0, X:610, Y_WN:184, B2:514.4, T:94, r:13, wt_WN:221.0,wt_SO:221.0,wt_BL:230.0},
+        { nps:"24",   dn:600, A:610.0, X:718, Y_WN:190, B2:616.0, T:114,r:13, wt_WN:315.0,wt_SO:315.0,wt_BL:325.0}
+      ]
+    },
+
+    // ── CLASS 900 ─────────────────────────────────────────────────
+    class900: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 6.4,
+      note: "NPS 1/2 to 2-1/2: use class 1500 dimensions",
+      sizes: [
+        { nps:"3",    dn:80,  A:88.9,  X:127, Y_WN:102, B2:91.4,  T:41, wt_WN:14.5, wt_BL:11.9 },
+        { nps:"4",    dn:100, A:114.3, X:159, Y_WN:114, B2:116.8, T:48, wt_WN:23.0, wt_BL:20.0 },
+        { nps:"5",    dn:125, A:141.3, X:190, Y_WN:127, B2:144.5, T:54, wt_WN:37.0, wt_BL:33.0 },
+        { nps:"6",    dn:150, A:168.3, X:235, Y_WN:140, B2:171.4, T:63, wt_WN:50.0, wt_BL:42.0 },
+        { nps:"8",    dn:200, A:219.1, X:298, Y_WN:162, B2:222.2, T:71, wt_WN:85.0, wt_BL:72.0 },
+        { nps:"10",   dn:250, A:273.0, X:368, Y_WN:184, B2:277.4, T:83, wt_WN:118.0,wt_BL:101.0},
+        { nps:"12",   dn:300, A:323.9, X:419, Y_WN:200, B2:328.2, T:86, wt_WN:163.0,wt_BL:134.0},
+        { nps:"14",   dn:350, A:355.6, X:451, Y_WN:213, B2:360.2, T:92, wt_WN:186.0,wt_BL:154.0},
+        { nps:"16",   dn:400, A:406.4, X:508, Y_WN:216, B2:411.2, T:102,wt_WN:224.0,wt_BL:186.0},
+        { nps:"18",   dn:450, A:457.0, X:565, Y_WN:229, B2:462.3, T:114,wt_WN:300.0,wt_BL:260.0},
+        { nps:"20",   dn:500, A:508.0, X:622, Y_WN:248, B2:514.4, T:127,wt_WN:373.0,wt_BL:320.0},
+        { nps:"24",   dn:600, A:610.0, X:749, Y_WN:292, B2:616.0, T:152,wt_WN:680.0,wt_BL:611.0}
+      ]
+    },
+
+    // ── CLASS 1500 ────────────────────────────────────────────────
+    class1500: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 6.4,
+      sizes: [
+        { nps:"1/2",  dn:15,  Y_WN:47,  X:38,  wt_WN:1.8,  wt_BL:null  },
+        { nps:"3/4",  dn:20,  Y_WN:52,  X:44,  wt_WN:2.4,  wt_BL:null  },
+        { nps:"1",    dn:25,  Y_WN:50,  X:50,  wt_WN:3.5,  wt_BL:null  },
+        { nps:"1-1/4",dn:32,  Y_WN:7,   X:63,  wt_WN:4.0,  wt_BL:null  },
+        { nps:"1-1/2",dn:40,  Y_WN:38,  X:70,  wt_WN:5.5,  wt_BL:null  },
+        { nps:"2",    dn:50,  Y_WN:44,  X:84,  wt_WN:10.0, wt_BL:null  },
+        { nps:"2-1/2",dn:65,  Y_WN:52,  X:100, wt_WN:13.9, wt_BL:null  },
+        { nps:"3",    dn:80,  Y_WN:63,  X:133, wt_WN:22.0, wt_BL:21.3  },
+        { nps:"4",    dn:100, Y_WN:70,  X:162, wt_WN:30.0, wt_BL:30.0  },
+        { nps:"5",    dn:125, Y_WN:105, X:197, wt_WN:33.0  },
+        { nps:"6",    dn:150, Y_WN:124, X:229, wt_WN:60.0, wt_BL:58.0  },
+        { nps:"8",    dn:200, Y_WN:133, X:292, wt_WN:70.0, wt_BL:72.0  },
+        { nps:"10",   dn:250, Y_WN:162, X:368, wt_WN:119.0,wt_BL:null  },
+        { nps:"12",   dn:300, Y_WN:197, X:451, wt_WN:204.0,wt_BL:null  },
+        { nps:"14",   dn:350, Y_WN:229, X:495, wt_WN:303.0,wt_BL:null  },
+        { nps:"16",   dn:400, Y_WN:241, X:552, wt_WN:426.0,wt_BL:null  },
+        { nps:"18",   dn:450, Y_WN:260, X:597, wt_WN:567.0,wt_BL:null  },
+        { nps:"20",   dn:500, Y_WN:276, X:641, wt_WN:737.0,wt_BL:null  },
+        { nps:"24",   dn:600, Y_WN:292, X:762, wt_WN:930.0,wt_BL:null  }
+      ]
+    },
+
+    // ── CLASS 2500 ────────────────────────────────────────────────
+    class2500: {
+      standard:    "ASME B16.5-1996",
+      raisedFaceHeight_mm: 6.4,
+      npsRange: "NPS 1/2 to 12",
+      sizes: [
+        { nps:"1/2",  dn:15,  A:21.3,  X:73,  Y_WN:79,  B2:22.9,  T:40, wt_WN:3.3,  wt_BL:3.6  },
+        { nps:"3/4",  dn:20,  A:26.7,  X:79,  Y_WN:79,  B2:28.2,  T:43, wt_WN:3.9,  wt_BL:4.0  },
+        { nps:"1",    dn:25,  A:33.4,  X:89,  Y_WN:89,  B2:35.0,  T:48, wt_WN:5.0,  wt_BL:6.0  },
+        { nps:"1-1/4",dn:32,  A:42.2,  X:95,  Y_WN:95,  B2:43.7,  T:52, wt_WN:8.1,  wt_BL:9.0  },
+        { nps:"1-1/2",dn:40,  A:48.3,  X:111, Y_WN:111, B2:50.0,  T:60, wt_WN:11.5, wt_BL:13.0 },
+        { nps:"2",    dn:50,  A:60.3,  X:127, Y_WN:127, B2:62.5,  T:70, wt_WN:17.6, wt_BL:19.0 },
+        { nps:"2-1/2",dn:65,  A:73.0,  X:143, Y_WN:143, B2:75.4,  T:79, wt_WN:26.0, wt_BL:24.0 },
+        { nps:"3",    dn:80,  A:88.9,  X:168, Y_WN:168, B2:91.4,  T:92, wt_WN:39.0, wt_BL:43.0 },
+        { nps:"4",    dn:100, A:114.3, X:190, Y_WN:190, B2:116.8, T:108,wt_WN:60.0, wt_BL:66.0 },
+        { nps:"5",    dn:125, A:141.3, X:229, Y_WN:229, B2:144.5, T:121,wt_WN:100.0,wt_BL:111.0},
+        { nps:"6",    dn:150, A:168.3, X:273, Y_WN:254, B2:171.4, T:140,wt_WN:140.0,wt_BL:172.0},
+        { nps:"8",    dn:200, A:219.1, X:317, Y_WN:273, B2:222.2, T:152,wt_WN:236.0,wt_BL:261.0},
+        { nps:"10",   dn:250, A:273.0, X:419, Y_WN:419, B2:277.4, T:178,wt_WN:450.0,wt_BL:485.0},
+        { nps:"12",   dn:300, A:323.9, X:464, Y_WN:464, B2:328.2, T:197,wt_WN:650.0,wt_BL:730.0}
+      ]
+    },
+
+    // ── LARGE BORE – MSS-SP 44 / ASME B16.47 Series A  ───────────
+    largeBore_SeriesA: {
+      standards: ["ASME B16.47 Series A-1996", "MSS-SP 44-1996", "BS 3293-1960"],
+      npsRange:  "NPS 26 to 60 (DN 650 to 1500)",
+      pressureClasses: [150, 300, 400, 600, 900],
+      note: "NPS 12 to 24 per MSS-SP 44 are identical to ASME B16.5",
+      classSummary: {
+        class150: {
+          raisedFaceHeight_mm: 1.6,
+          sizes: [
+            { nps:"26", dn:650,  X:749.3,  Y_WN:143, C:127.0, wt_WN:143  },
+            { nps:"28", dn:700,  X:800.1,  Y_WN:185, C:128.6, wt_WN:185  },
+            { nps:"30", dn:750,  X:857.2,  Y_WN:199, C:130.2, wt_WN:199  },
+            { nps:"32", dn:800,  X:914.4,  Y_WN:255, C:133.3, wt_WN:255  },
+            { nps:"34", dn:850,  X:965.2,  Y_WN:275, C:134.9, wt_WN:275  },
+            { nps:"36", dn:900,  X:1022.3, Y_WN:367, C:136.5, wt_WN:367  },
+            { nps:"38", dn:950,  X:1073.1, Y_WN:381, C:136.5, wt_WN:381  },
+            { nps:"40", dn:1000, X:1123.9, Y_WN:393, C:139.7, wt_WN:393  },
+            { nps:"42", dn:1050, X:1193.8, Y_WN:455, C:142.9, wt_WN:455  },
+            { nps:"44", dn:1100, X:1244.6, Y_WN:503, C:142.9, wt_WN:503  },
+            { nps:"46", dn:1150, X:1295.4, Y_WN:529, C:144.5, wt_WN:529  },
+            { nps:"48", dn:1200, X:1358.9, Y_WN:609, C:146.0, wt_WN:609  }
+          ]
+        },
+        class300: {
+          raisedFaceHeight_mm: 1.6,
+          sizes: [
+            { nps:"26", dn:650,  X:749.3,  Y_WN:288 },
+            { nps:"28", dn:700,  X:800.1,  Y_WN:340 },
+            { nps:"30", dn:750,  X:857.2,  Y_WN:406 },
+            { nps:"32", dn:800,  X:914.4,  Y_WN:468 },
+            { nps:"34", dn:850,  X:965.2,  Y_WN:524 },
+            { nps:"36", dn:900,  X:1022.3, Y_WN:606 },
+            { nps:"38", dn:950,  X:1028.7, Y_WN:null },
+            { nps:"40", dn:1000, X:1085.8, Y_WN:null },
+            { nps:"42", dn:1050, X:1136.6, Y_WN:null },
+            { nps:"44", dn:1100, X:1193.8, Y_WN:null },
+            { nps:"46", dn:1150, X:1244.6, Y_WN:null },
+            { nps:"48", dn:1200, X:1301.7, Y_WN:null }
+          ]
+        },
+        class600: {
+          raisedFaceHeight_mm: 6.4,
+          sizes: [
+            { nps:"26", dn:650,  X:774.7  },
+            { nps:"28", dn:700,  X:831.8  },
+            { nps:"30", dn:750,  X:889.0  },
+            { nps:"32", dn:800,  X:946.1  },
+            { nps:"34", dn:850,  X:1006.3 },
+            { nps:"36", dn:900,  X:1063.8 }
+          ]
+        }
+      }
+    },
+
+    // ── LARGE BORE – ASME B16.47 Series B (replaces API 605)  ────
+    largeBore_SeriesB: {
+      standards: ["ASME B16.47 Series B-1996"],
+      npsRange:  "NPS 26 to 60 (DN 650 to 1500)",
+      pressureClasses: [150, 300, 600, 900],
+      note: "For NPS ≥ 38 class 600 & 900, dimensions same as Series A",
+      class300_sizes: [
+        { nps:"26", dn:650,  O:803.1,  Y:144.5 },
+        { nps:"28", dn:700,  O:857.2,  Y:149.4 },
+        { nps:"30", dn:750,  O:920.8,  Y:158.0 },
+        { nps:"32", dn:800,  O:977.9,  Y:168.1 },
+        { nps:"34", dn:850,  O:1031.7, Y:173.0 },
+        { nps:"36", dn:900,  O:1089.2, Y:180.8 },
+        { nps:"38", dn:950,  O:1139.9, Y:192.0 },
+        { nps:"40", dn:1000, O:1190.8, Y:198.4 },
+        { nps:"42", dn:1050, O:1244.6, Y:204.7 },
+        { nps:"44", dn:1100, O:1295.4, Y:214.4 },
+        { nps:"46", dn:1150, O:1365.2, Y:222.2 },
+        { nps:"48", dn:1200, O:1416.0, Y:223.8 },
+        { nps:"50", dn:1250, O:1466.9, Y:235.0 },
+        { nps:"52", dn:1300, O:1517.8, Y:242.8 },
+        { nps:"54", dn:1350, O:1577.8, Y:239.8 },
+        { nps:"56", dn:1400, O:1651.0, Y:268.2 },
+        { nps:"58", dn:1450, O:1713.0, Y:274.6 },
+        { nps:"60", dn:1500, O:1763.8, Y:271.6 }
+      ]
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // ORIFICE FLANGES  (ASME B16.36-1996)
+  // ─────────────────────────────────────────────────────────────────
+  orifaceFlanges: {
+    standard: "ASME B16.36-1996",
+    tappingSize: "1/2 inch NPT (other sizes on request)",
+    tappingDepth_mm: 23.9,
+    note: "Dimensions O, B/A, X, R and drilling conform to ASME B16.5",
+    classes: {
+      class300:  { npsRange: "NPS 1 to 24 (threaded) / NPS 1 to 8 (threaded only)" },
+      class400:  { npsRange: "NPS 1 to 24", note: "Use class 600 for NPS 1/2 to 3-1/2" },
+      class600:  { npsRange: "NPS 1 to 24" },
+      class900:  { npsRange: "NPS 1 to 24", note: "Use class 1500 for NPS 1/2 to 2-1/2" },
+      class1500: { npsRange: "NPS 1 to 24" },
+      class2500: { npsRange: "NPS 1 to 12" }
+    },
+    class300_sizes: [
+      { nps:"1",    dn:25,  O:124, Y:50.8,  X:54,  C:38.1, wt:3.0  },
+      { nps:"1-1/2",dn:40,  O:156, Y:73.0,  X:84,  C:38.1, wt:5.0  },
+      { nps:"2",    dn:50,  O:165, Y:92.1,  X:100, C:38.1, wt:5.5  },
+      { nps:"2-1/2",dn:65,  O:190, Y:104.8, X:117, C:38.1, wt:6.2  },
+      { nps:"3",    dn:80,  O:210, Y:127.0, X:133, C:38.1, wt:8.0  },
+      { nps:"4",    dn:100, O:254, Y:157.2, X:152, C:38.1, wt:12.1 },
+      { nps:"6",    dn:150, O:318, Y:215.9, X:206, C:41.1, wt:18.5 },
+      { nps:"8",    dn:200, O:381, Y:269.9, X:260, C:47.8, wt:26.0 }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // API 6A SPECIAL FLANGES
+  // ─────────────────────────────────────────────────────────────────
+  api6A: {
+    standard: "API 6A-1999",
+    flangeTypes: ["Type 6B", "Type 6BX"],
+    facing: "Ring Joint (R, RX, BX)",
+    workingPressures: [
+      {
+        id:       "6B_5000",
+        type:     "API type 6B",
+        pressure_PSI: 5000,
+        pressure_bar: 345,
+        sizes_inches: ["2-1/16","2-9/16","3-1/16","4-1/16","7-1/16","9","11"],
+        boltSizes: [
+          { size:"2-1/16", bolts:8, boltDia_in:"0.438", boltLen_mm:152 },
+          { size:"2-9/16", bolts:8, boltDia_in:"0.438", boltLen_mm:165 },
+          { size:"3-1/16", bolts:8, boltDia_in:"0.438", boltLen_mm:184 },
+          { size:"4-1/16", bolts:8, boltDia_in:"0.438", boltLen_mm:203 },
+          { size:"7-1/16", bolts:8, boltDia_in:"0.625", boltLen_mm:254 }
+        ]
+      },
+      {
+        id:       "6BX_5000",
+        type:     "API type 6BX",
+        pressure_PSI: 5000,
+        pressure_bar: 345,
+        sizes_inches: ["1-13/16","2-1/16","2-9/16","3-1/16","4-1/16","7-1/16","9","11","13-5/8","16-3/4","18-3/4","21-1/4"]
+      },
+      {
+        id:       "6BX_10000",
+        type:     "API type 6BX",
+        pressure_PSI: 10000,
+        pressure_bar: 690,
+        sizes_inches: ["1-13/16","2-1/16","2-9/16","3-1/16","4-1/16","7-1/16","9","11","13-5/8"]
+      },
+      {
+        id:       "6BX_15000",
+        type:     "API type 6BX",
+        pressure_PSI: 15000,
+        pressure_bar: 1035,
+        sizes_inches: ["1-13/16","2-1/16","2-9/16","3-1/16","4-1/16","7-1/16","9","11","13-5/8"]
+      },
+      {
+        id:       "6BX_20000",
+        type:     "API type 6BX",
+        pressure_PSI: 20000,
+        pressure_bar: 1380,
+        sizes_inches: ["1-13/16","2-1/16","2-9/16","3-1/16","4-1/16","7-1/16","9","11"]
+      }
+    ],
+    ringJoints_BX: [
+      { number:"BX-150", bolts:16, size_in:"12.50", wt_kg:4.40 },
+      { number:"BX-151", bolts:8,  size_in:"5.00",  wt_kg:0.41 },
+      { number:"BX-152", bolts:8,  size_in:"5.20",  wt_kg:0.41 },
+      { number:"BX-153", bolts:8,  size_in:"6.00",  wt_kg:0.65 },
+      { number:"BX-154", bolts:8,  size_in:"6.75",  wt_kg:0.95 },
+      { number:"BX-155", bolts:8,  size_in:"8.00",  wt_kg:1.40 },
+      { number:"BX-156", bolts:12, size_in:"11.25", wt_kg:3.50 },
+      { number:"BX-157", bolts:12, size_in:"13.00", wt_kg:3.90 },
+      { number:"BX-158", bolts:16, size_in:"15.00", wt_kg:5.84 },
+      { number:"BX-159", bolts:20, size_in:"17.25", wt_kg:7.50 },
+      { number:"BX-160", bolts:16, size_in:"12.50", wt_kg:4.40 },
+      { number:"BX-162", bolts:16, size_in:"14.50", wt_kg:6.90 },
+      { number:"BX-163", bolts:20, size_in:"17.50", wt_kg:9.20 },
+      { number:"BX-164", bolts:24, size_in:"18.75", wt_kg:9.55 },
+      { number:"BX-165", bolts:24, size_in:"22.50" },
+      { number:"BX-166", bolts:24, size_in:"24.50" },
+      { number:"BX-169", bolts:8,  size_in:"8.75",  wt_kg:1.50 }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // TOLERANCES  (ASME B16.5-1996)
+  // ─────────────────────────────────────────────────────────────────
+  tolerances: {
+    bore_WN_flange_mm:        { NPS_le_10: "±0.8",  NPS_ge_12: "±1.6" },
+    bore_slipOn_lapped_mm:    { NPS_le_5:  "+3.2/-1.6", NPS_ge_6_le_24: "+0.8/0" },
+    hubOD_weldEnd_A_mm:       { allSizes:  "+2.4/-0.8" },
+    overallLength_WN_Y_mm:    { NPS_le_10: "+1.6/-3.2", NPS_ge_12: "+3.2/-4.6" },
+    hubThickness_t_mm:        { allSizes:  "≥87.5% of nominal wall thickness of attached pipe" },
+    boltCircleDia_mm:         { allSizes:  "±0.8" },
+    adjacentBoltHoles_mm:     { allSizes:  "±0.8" },
+    eccentricity_boltCircle_mm:{ allSizes: "±0.8" },
+    spotFacingDia_mm:         { allSizes:  "±1.6" },
+    raisedFaceHeight_class150_300_mm: "included in Y dimension",
+    raisedFaceHeight_class400plus_mm: 6.4
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // RING JOINT GROOVES  (ASME B16.5-1996)
+  // ─────────────────────────────────────────────────────────────────
+  ringJointGrooves: {
+    grooveAngle_deg: 23,
+    tolerances: {
+      pitchDia_P_mm:  "±0.13",
+      depth_E_mm:     "+0.40 / 0",
+      width_F_mm:     "±0.20",
+      radius_r_le_1p6mm: "+0.80 / 0",
+      radius_r_gt_1p6mm: "±0.80",
+      angle_deg: "±0.5"
+    },
+    // Selected ring numbers per class and NPS (ASME B16.5)
+    class150_rings: {
+      note: "See pages 436–439 for full dimensions",
+      samples: [
+        { nps:"1",    ring:"R15", P:47.62  },
+        { nps:"2",    ring:"R22", P:82.55  },
+        { nps:"4",    ring:"R35", P:152.40 },
+        { nps:"6",    ring:"R46", P:228.60 },
+        { nps:"8",    ring:"R49", P:304.80 },
+        { nps:"12",   ring:"R57", P:457.20 },
+        { nps:"16",   ring:"R68", P:596.90 },
+        { nps:"20",   ring:"R74", P:749.30 },
+        { nps:"24",   ring:"R76", P:863.60 }
+      ]
+    },
+    class900_rings: {
+      samples: [
+        { nps:"1/2",  ring:"R12"  },
+        { nps:"3/4",  ring:"R14"  },
+        { nps:"1",    ring:"R16"  },
+        { nps:"2",    ring:"R24"  },
+        { nps:"4",    ring:"R39"  },
+        { nps:"6",    ring:"R45"  },
+        { nps:"8",    ring:"R49"  },
+        { nps:"12",   ring:"R57"  },
+        { nps:"16",   ring:"R67"  },
+        { nps:"24",   ring:"R79"  },
+        { nps:"26",   ring:"R93"  },
+        { nps:"36",   ring:"R98"  }
+      ]
+    },
+    class2500_rings: {
+      samples: [
+        { nps:"1/2",  ring:"R13" },
+        { nps:"1",    ring:"R18" },
+        { nps:"2",    ring:"R26" },
+        { nps:"4",    ring:"R38" },
+        { nps:"6",    ring:"R46" },
+        { nps:"8",    ring:"R51" },
+        { nps:"12",   ring:"R60" }
+      ]
+    },
+    typeR_dimensions: {
+      surfaceFinish_Ra_max_µm: 1.6,
+      angle_deg: 23,
+      radius_R1_mm: { width_le_22p2mm: 1.6, width_ge_25p4mm: 2.4 },
+      selectedRings: [
+        { ring:"R11", P_mm:34.14,  A_mm:9.53,  H_mm:12.70, C_mm:7.75  },
+        { ring:"R13", P_mm:42.88,  A_mm:9.53,  H_mm:12.70, C_mm:7.75  },
+        { ring:"R16", P_mm:50.80,  A_mm:9.53,  H_mm:12.70, C_mm:7.75  },
+        { ring:"R18", P_mm:60.33,  A_mm:11.13, H_mm:15.88, C_mm:10.49 },
+        { ring:"R20", P_mm:68.28,  A_mm:11.13, H_mm:15.88, C_mm:10.49 },
+        { ring:"R23", P_mm:82.55,  A_mm:12.70, H_mm:19.05, C_mm:12.32 },
+        { ring:"R26", P_mm:101.60, A_mm:14.29, H_mm:22.23, C_mm:14.81 },
+        { ring:"R31", P_mm:123.83, A_mm:15.88, H_mm:25.40, C_mm:17.30 },
+        { ring:"R37", P_mm:152.40, A_mm:19.05, H_mm:28.58, C_mm:19.81 },
+        { ring:"R41", P_mm:190.50, A_mm:22.23, H_mm:31.75, C_mm:22.33 },
+        { ring:"R45", P_mm:228.60, A_mm:25.40, H_mm:34.93, C_mm:24.82 },
+        { ring:"R49", P_mm:304.80, A_mm:28.58, H_mm:38.10, C_mm:24.82 },
+        { ring:"R53", P_mm:381.00, A_mm:31.75, H_mm:41.40, C_mm:24.82 },
+        { ring:"R57", P_mm:457.20, A_mm:34.93, H_mm:44.45, C_mm:24.82 },
+        { ring:"R61", P_mm:533.40, A_mm:11.13, H_mm:17.53, C_mm:10.49 },
+        { ring:"R65", P_mm:609.60, A_mm:15.88, H_mm:20.57, C_mm:10.49 },
+        { ring:"R69", P_mm:685.80, A_mm:19.05, H_mm:23.88, C_mm:12.32 },
+        { ring:"R73", P_mm:762.00, A_mm:22.23, H_mm:26.92, C_mm:14.81 },
+        { ring:"R77", P_mm:914.40, A_mm:31.75, H_mm:38.10, C_mm:22.33 },
+        { ring:"R93", P_mm:749.30, A_mm:19.05, H_mm:19.05, C_mm:12.32 },
+        { ring:"R94", P_mm:800.10, A_mm:19.05, H_mm:23.88, C_mm:12.32 },
+        { ring:"R95", P_mm:857.25, A_mm:19.05, H_mm:23.88, C_mm:12.32 },
+        { ring:"R96", P_mm:914.40, A_mm:22.23, H_mm:26.92, C_mm:14.81 },
+        { ring:"R97", P_mm:965.20, A_mm:22.23, H_mm:26.92, C_mm:14.81 },
+        { ring:"R98", P_mm:1022.35,A_mm:22.23, H_mm:26.92, C_mm:14.81 }
+      ]
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // BOLTING  (ASME B16.5-1996)
+  // ─────────────────────────────────────────────────────────────────
+  bolting: {
+    studBolts: {
+      spec:    "ASTM A 193 / A 193M-99",
+      grades:  ["B7", "B16", "B8", "B8T"],
+      threads: ["UNC (up to 1\")", "8 UN (1-1/8\" and above)", "ISO metric"],
+      formula: "L = 2 (S + he + eb + i) + J",
+      formulaKey: {
+        S:  "free threads, 1–2 pitch",
+        he: "nut height",
+        eb: "flange thickness (with tolerance)",
+        i:  "height of raised face (for class 150/300 RF, included in eb)",
+        J:  "gasket thickness"
+      }
+    },
+    nuts: {
+      spec:   "ASTM A 194 / A 194M-98b",
+      grades: ["2H", "4", "8", "8T"],
+      types:  "Heavy hex nuts (ASME B18.2.2) or metric (ISO)"
+    },
+    // Stud bolt dimensions by class and NPS
+    studBolts_class150: [
+      { nps:"1/2",  nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:75,  len_RJ_mm:75  },
+      { nps:"3/4",  nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:90,  len_RJ_mm:90  },
+      { nps:"1",    nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:90,  len_RJ_mm:90  },
+      { nps:"1-1/4",nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:95,  len_RJ_mm:95  },
+      { nps:"1-1/2",nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:100, len_RJ_mm:100 },
+      { nps:"2",    nBolts:4,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:100, len_RJ_mm:100 },
+      { nps:"2-1/2",nBolts:4,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:100, len_RJ_mm:100 },
+      { nps:"3",    nBolts:4,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:110, len_RJ_mm:110 },
+      { nps:"3-1/2",nBolts:8,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:110, len_RJ_mm:110 },
+      { nps:"4",    nBolts:8,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:110, len_RJ_mm:115 },
+      { nps:"5",    nBolts:8,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:120, len_RJ_mm:120 },
+      { nps:"6",    nBolts:8,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:125, len_RJ_mm:130 },
+      { nps:"8",    nBolts:8,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:140, len_RJ_mm:140 },
+      { nps:"10",   nBolts:12, boltDia_in:"7/8",    boltDia_ISO:"M24", len_6p4mmRF_mm:160, len_RJ_mm:160 },
+      { nps:"12",   nBolts:12, boltDia_in:"7/8",    boltDia_ISO:"M24", len_6p4mmRF_mm:170, len_RJ_mm:170 },
+      { nps:"14",   nBolts:12, boltDia_in:"1",      boltDia_ISO:"M27", len_6p4mmRF_mm:175, len_RJ_mm:175 },
+      { nps:"16",   nBolts:16, boltDia_in:"1",      boltDia_ISO:"M27", len_6p4mmRF_mm:190, len_RJ_mm:190 },
+      { nps:"18",   nBolts:16, boltDia_in:"1-1/8",  boltDia_ISO:"M30", len_6p4mmRF_mm:195, len_RJ_mm:205 },
+      { nps:"20",   nBolts:20, boltDia_in:"1-1/8",  boltDia_ISO:"M33", len_6p4mmRF_mm:205, len_RJ_mm:210 },
+      { nps:"24",   nBolts:20, boltDia_in:"1-1/4",  boltDia_ISO:"M33", len_6p4mmRF_mm:230, len_RJ_mm:255 }
+    ],
+    studBolts_class600: [
+      { nps:"1/2",  nBolts:4,  boltDia_in:"1/2",    boltDia_ISO:"M14", len_6p4mmRF_mm:75,  len_RJ_mm:75  },
+      { nps:"3/4",  nBolts:4,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:90,  len_RJ_mm:90  },
+      { nps:"1",    nBolts:4,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:90,  len_RJ_mm:90  },
+      { nps:"1-1/2",nBolts:4,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:110, len_RJ_mm:110 },
+      { nps:"2",    nBolts:8,  boltDia_in:"5/8",    boltDia_ISO:"M16", len_6p4mmRF_mm:110, len_RJ_mm:110 },
+      { nps:"3",    nBolts:8,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:120, len_RJ_mm:130 },
+      { nps:"4",    nBolts:8,  boltDia_in:"7/8",    boltDia_ISO:"M24", len_6p4mmRF_mm:140, len_RJ_mm:145 },
+      { nps:"6",    nBolts:12, boltDia_in:"1",      boltDia_ISO:"M27", len_6p4mmRF_mm:165, len_RJ_mm:175 },
+      { nps:"8",    nBolts:12, boltDia_in:"1-1/8",  boltDia_ISO:"M30", len_6p4mmRF_mm:190, len_RJ_mm:195 },
+      { nps:"10",   nBolts:16, boltDia_in:"1-1/4",  boltDia_ISO:"M33", len_6p4mmRF_mm:215, len_RJ_mm:225 },
+      { nps:"12",   nBolts:20, boltDia_in:"1-1/4",  boltDia_ISO:"M33", len_6p4mmRF_mm:225, len_RJ_mm:235 },
+      { nps:"16",   nBolts:20, boltDia_in:"1-3/8",  boltDia_ISO:"M36", len_6p4mmRF_mm:255, len_RJ_mm:255 },
+      { nps:"20",   nBolts:20, boltDia_in:"1-5/8",  boltDia_ISO:"M42", len_6p4mmRF_mm:290, len_RJ_mm:295 },
+      { nps:"24",   nBolts:20, boltDia_in:"1-7/8",  boltDia_ISO:"M48", len_6p4mmRF_mm:330, len_RJ_mm:335 }
+    ],
+    studBolts_class2500: [
+      { nps:"1/2",  nBolts:4,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:120, len_RJ_mm:120 },
+      { nps:"3/4",  nBolts:4,  boltDia_in:"3/4",    boltDia_ISO:"M20", len_6p4mmRF_mm:125, len_RJ_mm:125 },
+      { nps:"1",    nBolts:4,  boltDia_in:"7/8",    boltDia_ISO:"M24", len_6p4mmRF_mm:140, len_RJ_mm:140 },
+      { nps:"1-1/4",nBolts:4,  boltDia_in:"1",      boltDia_ISO:"M27", len_6p4mmRF_mm:150, len_RJ_mm:150 },
+      { nps:"1-1/2",nBolts:4,  boltDia_in:"1-1/8",  boltDia_ISO:"M30", len_6p4mmRF_mm:170, len_RJ_mm:170 },
+      { nps:"2",    nBolts:8,  boltDia_in:"1",      boltDia_ISO:"M27", len_6p4mmRF_mm:180, len_RJ_mm:180 },
+      { nps:"2-1/2",nBolts:8,  boltDia_in:"1-1/8",  boltDia_ISO:"M30", len_6p4mmRF_mm:195, len_RJ_mm:205 },
+      { nps:"3",    nBolts:8,  boltDia_in:"1-1/4",  boltDia_ISO:"M33", len_6p4mmRF_mm:220, len_RJ_mm:230 },
+      { nps:"4",    nBolts:8,  boltDia_in:"1-1/2",  boltDia_ISO:"M39", len_6p4mmRF_mm:255, len_RJ_mm:260 },
+      { nps:"6",    nBolts:8,  boltDia_in:"1-3/4",  boltDia_ISO:"M45", len_6p4mmRF_mm:300, len_RJ_mm:310 },
+      { nps:"8",    nBolts:8,  boltDia_in:"2",      boltDia_ISO:"M52", len_6p4mmRF_mm:345, len_RJ_mm:355 },
+      { nps:"10",   nBolts:12, boltDia_in:"2",      boltDia_ISO:"M52", len_6p4mmRF_mm:380, len_RJ_mm:395 },
+      { nps:"12",   nBolts:12, boltDia_in:"2-1/2",  boltDia_ISO:"M64", len_6p4mmRF_mm:490, len_RJ_mm:510 }
+    ],
+    boltingMaterials: {
+      highTemp: {
+        studBolts_spec: "ASTM A 193/A 193M-99",
+        grades: [
+          {
+            grade: "B7",
+            material: "Cr-Mo alloy steel (42CD4)",
+            tempRange_C: "-48 to 538",
+            tensileMin_MPa: 860,
+            yieldMin_MPa:   720,
+            elongMin_pct:   16,
+            reductionMin_pct: 50,
+            hardnessMax: "≤321 HB / ≤35 HRC"
+          },
+          {
+            grade: "B16",
+            material: "Cr-Mo-V alloy steel (42CDV4)",
+            tempRange_C: "-48 to 538",
+            tensileMin_MPa: 860,
+            yieldMin_MPa:   725,
+            elongMin_pct:   16
+          },
+          {
+            grade: "B8",
+            material: "Austenitic stainless 304 (Z6CN18-09)",
+            tempRange_C: "-198 to 538",
+            tensileMin_MPa: 515,
+            yieldMin_MPa:   205,
+            hardnessMax: "≤223 HB / ≤96 HRB"
+          },
+          {
+            grade: "B8T",
+            material: "Austenitic stainless 321 (Z6CNT18-10)",
+            tempRange_C: "-254 to 816"
+          }
+        ],
+        nuts_spec: "ASTM A 194/A 194M-98b",
+        nutGrades: ["2H", "4", "8", "8T"]
+      },
+      lowTemp: {
+        spec: "ASTM A 320 / A 320M-98",
+        grades: [
+          { grade:"L7",  material:"Cr-Mo (42CD4)", tempRange_C:"-101 to 593" },
+          { grade:"L43", material:"Ni-Cr-Mo",      tempRange_C:"-101 to 371" }
+        ]
+      }
+    },
+    heavyHexNuts_ASME_B18_2_2: {
+      note: "UNC threads up to 1\"; 8 UN for sizes 1-1/8\" and above (ASME B1.1-1989)",
+      selectedSizes: [
+        { dia_in:"1/2",   threads_per_in:13, G_mm:22.0, H_mm:17.0, wt_per100_kg:1.41 },
+        { dia_in:"5/8",   threads_per_in:11, G_mm:27.0, H_mm:21.2, wt_per100_kg:2.73 },
+        { dia_in:"3/4",   threads_per_in:10, G_mm:32.0, H_mm:24.3, wt_per100_kg:4.75 },
+        { dia_in:"7/8",   threads_per_in:9,  G_mm:36.0, H_mm:27.4, wt_per100_kg:8.56 },
+        { dia_in:"1",     threads_per_in:8,  G_mm:41.0, H_mm:30.1, wt_per100_kg:13.5 },
+        { dia_in:"1-1/8", threads_per_in:8,  G_mm:46.0, H_mm:33.3, wt_per100_kg:20.7 },
+        { dia_in:"1-1/4", threads_per_in:8,  G_mm:51.0, H_mm:36.4, wt_per100_kg:27.9 },
+        { dia_in:"1-3/8", threads_per_in:8,  G_mm:56.0, H_mm:39.5, wt_per100_kg:36.0 },
+        { dia_in:"1-1/2", threads_per_in:8,  G_mm:61.0, H_mm:42.6, wt_per100_kg:49.2 },
+        { dia_in:"1-3/4", threads_per_in:8,  G_mm:71.0, H_mm:48.9, wt_per100_kg:74.6 },
+        { dia_in:"2",     threads_per_in:8,  G_mm:82.0, H_mm:55.1, wt_per100_kg:109.3},
+        { dia_in:"2-1/4", threads_per_in:8,  G_mm:92.0, H_mm:61.4, wt_per100_kg:155.8},
+        { dia_in:"2-1/2", threads_per_in:8,  G_mm:103.0,H_mm:67.2, wt_per100_kg:211.5},
+        { dia_in:"2-3/4", threads_per_in:8,  G_mm:113.0,H_mm:73.5, wt_per100_kg:287.5}
+      ]
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // GASKETS
+  // ─────────────────────────────────────────────────────────────────
+  gaskets: {
+    flatGaskets: {
+      standard:     "ASME B16.21-1992",
+      note:         "No metric dimensions in B16.21; values converted from inches",
+      dimensionKey: {
+        ID:  "Inside diameter (G mini)",
+        OD:  "Outside diameter (D maxi)",
+        note: "Manufacturer's 'self-centering' gaskets: OD = bolt-circle tangent minus 1 mm"
+      },
+      // Selected OD values (class 150 RF, ASME B16.5)
+      class150_RF_samples: [
+        { nps:"1/2", ID_mm:21.3, OD_mm:50.8 },
+        { nps:"1",   ID_mm:27.0, OD_mm:57.2 },
+        { nps:"2",   ID_mm:35.1, OD_mm:76.2 },
+        { nps:"4",   ID_mm:60.5, OD_mm:114.3},
+        { nps:"6",   ID_mm:73.2, OD_mm:149.2},
+        { nps:"8",   ID_mm:92.2, OD_mm:190.5},
+        { nps:"12",  ID_mm:128.6,OD_mm:269.9},
+        { nps:"16",  ID_mm:168.4,OD_mm:342.9},
+        { nps:"20",  ID_mm:209.6,OD_mm:419.1},
+        { nps:"24",  ID_mm:247.7,OD_mm:508.0}
+      ]
+    },
+    spiralWoundGaskets: {
+      standard:  "ASME B16.20-1998 (replaces API 601-1988)",
+      winding:   "Spiral wound with filler",
+      ringTypes: ["Inner ring (optional)", "Centering ring", "Winding"],
+      dimensionKey: {
+        d1: "Inner ring inside diameter (if required)",
+        d2: "Gasket inside diameter (winding)",
+        d3: "Gasket outside diameter (winding)",
+        d4: "Centering ring outside diameter"
+      },
+      centeringRingThickness_mm: "3.0 to 3.3",
+      windingWidth_mm: 4.45,
+      tolerances: {
+        d2_mm: { NPS_half_8: "±0.4", NPS_10_24: "±0.8" },
+        d3_mm: { NPS_half_8: "±0.8", NPS_10_24: "+1.52/-0.8" },
+        d4_mm: { allSizes: "±0.8" }
+      },
+      // Selected d2/d3 for B16.5 RF flanges
+      class150_RF_samples: [
+        { nps:"1/2", d2:19.1, d3:47.8 },
+        { nps:"1",   d2:25.4, d3:57.2 },
+        { nps:"2",   d2:31.8, d3:69.9 },
+        { nps:"4",   d2:58.7, d3:92.2  },
+        { nps:"6",   d2:73.2, d3:117.6 },
+        { nps:"8",   d2:92.2, d3:143.0 },
+        { nps:"12",  d2:120.7,d3:174.8 },
+        { nps:"16",  d2:168.4,d3:222.3 },
+        { nps:"20",  d2:209.6,d3:269.0 },
+        { nps:"24",  d2:247.7,d3:317.5 }
+      ],
+      class900_RF_samples: [
+        { nps:"3",   d2:85.9,  d3:111.3  },
+        { nps:"4",   d2:98.6,  d3:136.7  },
+        { nps:"6",   d2:120.7, d3:174.8  },
+        { nps:"8",   d2:143.0, d3:196.9  },
+        { nps:"12",  d2:147.6, d3:209.6  },
+        { nps:"16",  d2:196.9, d3:263.7  },
+        { nps:"20",  d2:247.7, d3:320.8  },
+        { nps:"24",  d2:304.8, d3:387.4  }
+      ]
+    },
+    ringJointGaskets: {
+      standard:     "ASME B16.20-1998",
+      types:        ["R – Oval", "R – Octagonal", "RX – Pressure-energised", "BX – API 6A"],
+      surfaceFinish_Ra_max_µm: { typeR: 1.6, typeBX: 0.8 },
+      materials: [
+        { mat:"Soft iron",          hardness_HB_max:90,  code:"SI"  },
+        { mat:"Low carbon steel",   hardness_HB_max:120, code:"CS"  },
+        { mat:"F5 (5% Cr)",         hardness_HB_max:130, code:"F5"  },
+        { mat:"S410 (13 Cr)",       hardness_HB_max:170, code:"S410"},
+        { mat:"S304 (304 SS)",      hardness_HB_max:160, code:"S304"},
+        { mat:"S316 (316 SS)",      hardness_HB_max:160, code:"S316"},
+        { mat:"S321 (321 SS)",      hardness_HB_max:160, code:"S321"},
+        { mat:"S347 (347 SS)",      hardness_HB_max:160, code:"S347"},
+        { mat:"Alloy 600 (Inconel)",hardness_HB_max:160, code:"A600"}
+      ],
+      applicationMatrix: {
+        note: "Always select ring material softer than flange material",
+        class150_rings:  "R series",
+        class300_600_rings: "R series",
+        class900_rings:  "R series (use class 1500 for NPS 1/2–2-1/2)",
+        class1500_rings: "R series",
+        class2500_rings: "R series",
+        api6B_rings:     "R or RX",
+        api6BX_rings:    "BX"
+      }
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // SPECTACLE BLINDS / SPADES / SPACERS  (ASME B16.5 classes)
+  // ─────────────────────────────────────────────────────────────────
+  spectacleBlinds: {
+    description: "Reversible spectacle blinds (obturateurs réversibles), line spades, spacers and line blinds",
+    manufacturing: "Preferably one piece; stainless/alloy steel may be 3 pieces (spectacle) or 2 pieces (spades)",
+    classesAvailable: [150, 300, 400, 600, 900, 1500, 2500],
+    facingTypes: ["Raised face (RF)", "Ring joint face (RTJ)"],
+    rtjTypes: ["Female type (with RTJ groove)", "Male type (flat face with raised RTJ land)"],
+    dimensionKey: {
+      B: "Outer diameter of blind/spade",
+      d: "Pipe bore diameter",
+      C: "Bolt circle diameter (matches flange)",
+      E: "Flange thickness equivalent",
+      b1:"Thickness of blank (spade/blind)",
+      b2:"Thickness of spacer ring",
+      F: "Thickness of spectacle web",
+      P: "Pitch diameter of RTJ groove",
+      f: "Depth of RTJ groove",
+      h: "Height of RTJ land (male type)"
+    },
+    class300_spectacle_samples: [
+      { nps:"1/2", B:51, d:16.0, C:67,  E:30, b1:6.5, b2:4  },
+      { nps:"1",   B:63, d:22.0, C:83,  E:35, b1:6.5, b2:4  },
+      { nps:"2",   B:79, d:41.5, C:98,  E:40, b1:6.5, b2:6  },
+      { nps:"4",   B:108,d:54.0, C:127, E:45, b1:9.5, b2:8  },
+      { nps:"6",   B:146,d:79.5, C:168, E:55, b1:12.5,b2:10 },
+      { nps:"8",   B:184,d:105.0,C:200, E:55, b1:16.0,b2:14 },
+      { nps:"12",  B:257,d:155.5,C:270, E:55, b1:19.0,b2:18 },
+      { nps:"16",  B:336,d:203.0,C:387, E:55, b1:28.5,b2:24 },
+      { nps:"20",  B:438,d:257.0,C:489, E:60, b1:41.5,b2:40 },
+      { nps:"24",  B:540,d:305.0,C:590, E:60, b1:44.5,b2:60 }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // LONG WELDING NECK FLANGES
+  // ─────────────────────────────────────────────────────────────────
+  longWeldingNeck: {
+    description: "Long welding-neck flanges (brides long welding-neck)",
+    note: "Hub length (N) to be specified by purchaser. Raised face included/excluded as noted per class.",
+    standards: ["ASME B16.5-1996 (drilling and OD)"],
+    classesAvailable: [150, 300, 600, 900, 1500],
+    class300_samples: [
+      { nps:"1/2",  O:95,  N:"specify", C:60.3,  R:34.9  },
+      { nps:"1",    O:117, N:"specify", C:69.8,  R:42.9  },
+      { nps:"2",    O:156, N:"specify", C:88.9,  R:63.5  },
+      { nps:"4",    O:210, N:"specify", C:114.3, R:92.1  },
+      { nps:"6",    O:254, N:"specify", C:139.7, R:104.8 },
+      { nps:"8",    O:318, N:"specify", C:152.4, R:127.0 },
+      { nps:"12",   O:444, N:"specify", C:203.2, R:203.2 },
+      { nps:"16",   O:521, N:"specify", C:254.0, R:254.0 },
+      { nps:"20",   O:584, N:"specify", C:304.8, R:304.8 },
+      { nps:"24",   O:648, N:"specify", C:355.6, R:355.6 }
+    ]
+  }
+
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT  (Node.js / CommonJS)
+// ─────────────────────────────────────────────────────────────────────────────
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = SPECREF_FLANGE_DB;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT  (ES Module)
+// ─────────────────────────────────────────────────────────────────────────────
+// export default SPECREF_FLANGE_DB;
